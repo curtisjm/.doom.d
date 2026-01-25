@@ -52,3 +52,8 @@
 ;; (unpin! pinned-package another-pinned-package)
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;; (unpin! t)
+
+;; Org-mode beautification (Obsidian-style)
+(package! org-modern)
+(package! org-appear)
+(package! olivetti)
