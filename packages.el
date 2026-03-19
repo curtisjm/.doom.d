@@ -57,3 +57,12 @@
 (package! org-modern)
 (package! org-appear)
 (package! olivetti)
+
+;; Sidebar for org headings
+(package! org-sidebar)
+
+(package! ftable)
+
+;; GitHub Copilot
+(package! copilot
+  :recipe (:host github :repo "copilot-emacs/copilot.el" :files ("*.el")))

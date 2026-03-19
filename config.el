@@ -21,8 +21,8 @@
 ;; See 'C-h v doom-font' for documentation and more examples of what they
 ;; accept. For example:
 ;;
-;;(setq doom-font (font-spec :family "Fira Code" :size 12 :weight 'semi-light)
-;;      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 13))
+(setq doom-font (font-spec :family "JetBrains Mono" :size 16)
+      doom-variable-pitch-font (font-spec :family "JetBrains Mono" :size 16))
 ;;
 ;; If you or Emacs can't find your font, use 'M-x describe-font' to look them
 ;; up, `M-x eval-region' to execute elisp code, and 'M-x doom/reload-font' to
@@ -32,11 +32,11 @@
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-(setq doom-theme 'doom-one)
+(setq doom-theme 'doom-moonlight)
 
-;; This determines the style of line numbers in effect. If set to `nil', line
-;; numbers are disabled. For relative line numbers, set this to `relative'.
-(setq display-line-numbers-type t)
+;; Relative line numbers with actual line number on current line
+(setq display-line-numbers-type 'relative
+      display-line-numbers-current-absolute t)
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
@@ -256,8 +256,8 @@
 (use-package! olivetti
   :hook (org-mode . olivetti-mode)
   :config
-  (setq olivetti-body-width 80
-        olivetti-minimum-body-width 60
+  (setq olivetti-body-width 120
+        olivetti-minimum-body-width 80
         olivetti-style 'fancy))
 
 ;; ---------------------------------------------------------------------------
@@ -324,33 +324,73 @@
         org-startup-with-inline-images t
         org-image-actual-width '(400))
 
-  ;; Better line spacing for readability
-  (setq-local line-spacing 0.15)
-
-  ;; Heading sizes (Obsidian-style hierarchy)
+  ;; Heading sizes with colors (inheriting from outline faces)
   (custom-set-faces!
-    '(org-document-title :height 1.8 :weight bold)
-    '(org-level-1 :height 1.5 :weight bold)
-    '(org-level-2 :height 1.3 :weight bold)
-    '(org-level-3 :height 1.2 :weight bold)
-    '(org-level-4 :height 1.1 :weight bold)
-    '(org-level-5 :height 1.05)
-    '(org-level-6 :height 1.0)
-    '(org-level-7 :height 1.0)
-    '(org-level-8 :height 1.0)))
+    '(org-document-title :inherit outline-1 :height 1.8 :weight bold)
+    '(org-level-1 :inherit outline-1 :height 1.5 :weight bold)
+    '(org-level-2 :inherit outline-2 :height 1.3 :weight bold)
+    '(org-level-3 :inherit outline-3 :height 1.2 :weight bold)
+    '(org-level-4 :inherit outline-4 :height 1.1 :weight bold)
+    '(org-level-5 :inherit outline-5 :height 1.05)
+    '(org-level-6 :inherit outline-6 :height 1.0)
+    '(org-level-7 :inherit outline-7 :height 1.0)
+    '(org-level-8 :inherit outline-8 :height 1.0)))
+
+;; ---------------------------------------------------------------------------
+;; Line spacing and larger text for org-mode readability
+;; ---------------------------------------------------------------------------
+(defun my/org-mode-visual-setup ()
+  "Set up better spacing and larger text for org-mode."
+  (setq-local line-spacing 0.3)
+  ;; Increase text size in org-mode (1 step = ~12% larger)
+  (text-scale-increase 1))
+
+(add-hook 'org-mode-hook #'my/org-mode-visual-setup)
+
+;; Extra space around headings
+(setq org-cycle-separator-lines 2)
 
 ;; ---------------------------------------------------------------------------
 ;; Visual line mode for soft wrapping (like Obsidian)
 ;; ---------------------------------------------------------------------------
 (add-hook 'org-mode-hook #'visual-line-mode)
 
+;; Make 0/$ go to actual line start/end in org-mode
+(add-hook 'org-mode-hook
+          (lambda ()
+            (evil-local-set-key 'normal "0" #'evil-beginning-of-line)
+            (evil-local-set-key 'normal "$" #'evil-end-of-line)
+            (evil-local-set-key 'motion "0" #'evil-beginning-of-line)
+            (evil-local-set-key 'motion "$" #'evil-end-of-line)))
+
+;; Line numbers are kept enabled (configured globally in doom)
+
 ;; ---------------------------------------------------------------------------
-;; No line numbers in org-mode (cleaner, like Obsidian)
+;; Org-sidebar for headings outline
 ;; ---------------------------------------------------------------------------
-(add-hook 'org-mode-hook (lambda () (display-line-numbers-mode -1)))
+(use-package! org-sidebar
+  :commands (org-sidebar-toggle org-sidebar-tree-toggle)
+  :config
+  (setq org-sidebar-tree-side 'right))
 
 ;; ---------------------------------------------------------------------------
 ;; Variable-pitch font for body text, fixed-pitch for code (optional)
 ;; Uncomment if you want proportional fonts like Obsidian
 ;; ---------------------------------------------------------------------------
 ;; (add-hook 'org-mode-hook #'mixed-pitch-mode)
+
+;; ============================================================================
+;; GITHUB COPILOT
+;; ============================================================================
+;; (use-package! copilot
+;;   :hook (prog-mode . copilot-mode)
+;;   :config
+;;   ;; Accept completions with C-f / right arrow (avoids TAB conflicts with corfu)
+;;   (map! :map copilot-completion-map
+;;         "C-f"       #'copilot-accept-completion
+;;         "<right>"   #'copilot-accept-completion
+;;         "M-f"       #'copilot-accept-completion-by-word
+;;         "M-<right>" #'copilot-accept-completion-by-word
+;;         "C-e"       #'copilot-accept-completion-by-line
+;;         "M-n"       #'copilot-next-completion
+;;         "M-p"       #'copilot-previous-completion))
