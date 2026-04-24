@@ -32,7 +32,7 @@
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-(setq doom-theme 'doom-moonlight)
+(setq doom-gruvbox-dark-variant 'hard)
 
 ;; Relative line numbers with actual line number on current line
 (setq display-line-numbers-type 'relative
@@ -373,6 +373,7 @@
   :config
   (setq org-sidebar-tree-side 'right))
 
+
 ;; ---------------------------------------------------------------------------
 ;; Variable-pitch font for body text, fixed-pitch for code (optional)
 ;; Uncomment if you want proportional fonts like Obsidian
@@ -394,3 +395,10 @@
 ;;         "C-e"       #'copilot-accept-completion-by-line
 ;;         "M-n"       #'copilot-next-completion
 ;;         "M-p"       #'copilot-previous-completion))
+
+(setq scroll-margin 999)
+
+;; ---------------------------------------------------------------------------
+;; Tree-sitter grammar load path (NixOS)
+;; ---------------------------------------------------------------------------
+(setq treesit-extra-load-path '("/run/current-system/sw/lib"))
